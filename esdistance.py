@@ -19,8 +19,19 @@ body={"doc":
     {'title':'haha透過python client產生中文，很多很多中文科科科'}}
 res=es.update(index='distance', doc_type='_doc', body=body, id='33336')
 print(res)
+"""
 body={"doc":
     {'title':'new 透過python client產生中文，很多很多中文科科科'}}
 res=es.create(index='distance', doc_type='_doc', body=body, id='33337')
+"""
 
-
+# search, we can fit lots
+result = es.search(
+    index="distance",
+    body={
+        "query": {
+            "match_all": {}
+        }
+    }
+)
+print(result)
