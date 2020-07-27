@@ -4,7 +4,17 @@ import PyPDF2
 import pandas as pd
 import pdftotext
 import time
+from elasticsearch import Elasticsearch
 
+def initES():
+    es=Elasticsearch()
+    return es
+
+def updateIndex(es, body):
+    #body={'name':'aaa', 'content':'using id as key'}
+    #es.index(index='pdfindex', doc_type='_doc', id='path-filename-page', body=body)
+    es.index(index='pdfindex', doc_type='_doc', body=body)
+    return
 
 def getPdfPages(pdfbook):
     file=pdfbook
@@ -69,12 +79,15 @@ def extractPdfFiles(files):
         this_loc=this_loc+1
     return df
 
-def storePdfToES(pdfbook, storeByPage=False):
+def storePdfToES(pdfbook, es, storeByPage=False):
+    pdftext=None
     if not storeByPage:
         pdftext, pages = getTextFromPDF(pdfbook, 0)
         print('-----start store all page to 1 Docs-----------', pdfbook, pages)
         print(pdftext, pages)
         print('-----end ----------')
+        body={'name':pdfbook, 'content': pdftext, 'page': 0}
+        updateIndex(es, body)
     # store by page
     else:
         nPages=getPdfPages(pdfbook)
@@ -84,6 +97,15 @@ def storePdfToES(pdfbook, storeByPage=False):
             print('-------  start store pdfbook page -----',pdfbook, nPage)
             print(pdftext)
             print('-------  end ---------------')
+    #body={'name':'aaa', 'content':'using id as key'}
+            if pdftext:
+                body={'name':pdfbook, 'content': pdftext, 'page': nPage}
+                updateIndex(es, body)
+            else:
+                print('no context in the pdf file')
+                body={'name':pdfbook, 'content': pdftext, 'page': nPage}
+                updateIndex(es, body)
+
     return True
 
 os.chdir('./pdfdata')
@@ -91,10 +113,11 @@ pdfbooks=glob.glob('*.*')
 print(len(pdfbooks))
 print(pdfbooks)
 
-storeByPage=False
+storeByPage=True
+es = initES()
 for pdfbook in pdfbooks:
     print(pdfbook)
-    storePdfToES(pdfbook, storeByPage)
+    storePdfToES(pdfbook, es,  storeByPage)
 
 
 """
