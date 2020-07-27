@@ -6,13 +6,6 @@ import pdftotext
 import time
 
 
-def getPdfPages(pdfbook):
-    file=pdfbook
-    with open(file, "rb") as f:
-        pdf = pdftotext.PDF(f)
-    npage=1
-    totPages=len(pdf)
-    return totPages
 
 def getTextFromPDF(pdfbook, pageNum=0):
     #file='pdfdata/TestingDoc.pdf'
@@ -21,18 +14,18 @@ def getTextFromPDF(pdfbook, pageNum=0):
         pdf = pdftotext.PDF(f)
     npage=1
     totPages=len(pdf)
-    #for page in pdf:
-        #print('-----individual page---------', npage)
-        #print(npage)
-        #print(page)
-        #npage=npage+1
-    #print(pageNum)
+    for page in pdf:
+        print('-----individual page---------', npage)
+        print(npage)
+        print(page)
+        npage=npage+1
+    print(pageNum)
     if pageNum==0:
         print('------ all pages data ------')
         print("\n\n".join(pdf))
         alltext="\n\n".join(pdf)
     else:
-        alltext=pdf[pageNum-1]
+        alltext=pdf[pageNum]
     return alltext, totPages
 
 def PdfToTextToPD(files):
@@ -69,41 +62,21 @@ def extractPdfFiles(files):
         this_loc=this_loc+1
     return df
 
-def storePdfToES(pdfbook, storeByPage=False):
-    if not storeByPage:
-        pdftext, pages = getTextFromPDF(pdfbook, 0)
-        print('-----start store all page to 1 Docs-----------', pdfbook, pages)
-        print(pdftext, pages)
-        print('-----end ----------')
-    # store by page
-    else:
-        nPages=getPdfPages(pdfbook)
-        #pages from 1 but array still from 0
-        for nPage in range(1, nPages+1):
-            pdftext, pages = getTextFromPDF(pdfbook, nPage)
-            print('-------  start store pdfbook page -----',pdfbook, nPage)
-            print(pdftext)
-            print('-------  end ---------------')
-    return True
 
-os.chdir('./pdfdata')
-pdfbooks=glob.glob('*.*')
-print(len(pdfbooks))
-print(pdfbooks)
-
-storeByPage=False
-for pdfbook in pdfbooks:
-    print(pdfbook)
-    storePdfToES(pdfbook, storeByPage)
-
-
-"""
 os.chdir('./pdfdata')
 pdfbooks=glob.glob('*.*')
 print(len(pdfbooks))
 print(pdfbooks)
 df = PdfToTextToPD(pdfbooks)
 
+
+print('---------show head-----------')
+print(df.head())
+print('--------- show head end ---------')
+col_name = df.columns
+print('------ show total col -----------')
+print(df.shape[0])
+totPdfBooks=df.shape[0]
 for row_number in range(totPdfBooks):
     body={
         "name": str(df.iloc[row_number]['name']),
@@ -111,4 +84,21 @@ for row_number in range(totPdfBooks):
           }
     print(body)
     print('-------------------------------')
+    # insert es here for each PdfFile and also can insert by pages.
+"""
+for book in pdfbooks:
+    print(book)
+    #textpdf, totPages = getTextFromPDF(book)
+    textpdf, totPages = PdfToTextToPD(book)
+    print(textpdf)
+    print('total pages:',totPages)
+df=extractPdfFiles(pdfbooks)
+print(df.head())
+
+col_name = df.columns
+for row_number in range(df.shape[0]):
+    for name in col_name:
+        print(str(df.iloc[row_number][name]))
+        #body=dict([name, str(df.iloc[row_number][name])) for name in col_names])
+        #print(body)
 """
