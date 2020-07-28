@@ -1,5 +1,6 @@
 import os
 import glob
+import glob2
 import PyPDF2
 import pandas as pd
 import pdftotext
@@ -108,8 +109,10 @@ def storePdfToES(pdfbook, es, storeByPage=False):
 
     return True
 
-os.chdir('./pdfdata')
-pdfbooks=glob.glob('*.*')
+#os.chdir('./pdfdata')
+#pdfbooks=glob.glob('*.*')
+pdfbooks=glob2.glob('./**/*.pdf', recursive=True)
+
 print(len(pdfbooks))
 print(pdfbooks)
 
