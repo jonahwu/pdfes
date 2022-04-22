@@ -43,7 +43,7 @@ pygobject==3.26.1
 pylint==2.5.3
 pynvim==0.4.1
 pyOpenSSL==17.5.0
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pyserial==3.4
 python-apt==1.6.5+ubuntu0.2
 python-dateutil==2.8.1
